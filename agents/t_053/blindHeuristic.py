@@ -35,10 +35,18 @@ class myAgent():
         state = self.game_rule.generateSuccessor(state, action, self.id)
         
         # Check if whether it reached goal or not TODO:
+
+        # Temporary make a self where it is in the next state
+        temp_self = deepcopy(self)
+        temp_state = deepcopy(state)
+        temp_self.current_game_state = temp_state
+        temp_self.current_agent_index = temp_self.getNextAgentIndex()
+        temp_self.action_counter += 1
+
         # Check if a row is completed
-        row_completed = self.game_rule.gameEnds()
+        row_completed = temp_self.game_rule.gameEnds()
         goal_reached = row_completed
-        
+       
         return goal_reached
     
     # Take a list of actions and an initial state, and perform A* search within a time limit. TODO:
@@ -79,7 +87,7 @@ class myAgent():
     def Heuristic(move, state):
         value = 0
 
-
+        
 
         return value
 
