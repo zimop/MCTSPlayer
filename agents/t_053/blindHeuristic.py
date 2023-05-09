@@ -57,7 +57,7 @@ class myAgent():
         pqueue = utils.ProrityQueue
         startState = deepcopy(rootstate)
         startNode = (startState, '',0, [])
-        pqueue.push(startNode, self.Heuristic('', startState)) # Initialise priority queue. First node = root state and an empty path.
+        pqueue.push(startNode, self.Heuristic(self, startState)) # Initialise priority queue. First node = root state and an empty path.
 
         visited = set()
         best_g = dict()
@@ -80,14 +80,16 @@ class myAgent():
                     return next_path[0] # If the current action reached the goal, return the initial action that led there.
                 else:
                     new_node = (next_state, next_action, cost, next_path) # New node for next search (cost change?)
-                    pqueue.push(new_node, self.Heuristic(next_action, next_state)) # Else, simply add this state and its path to the queue.
+                    pqueue.push(new_node, self.Heuristic(self, next_state)+cost) # Else, simply add this state and its path to the queue.
         
         return random.choice(actions) # If no goal was found in the time limit, return a random action.
     
-    def Heuristic(move, state):
-        value = 0
+    def Heuristic(self, state):
 
+        value = self.game_rule.calScore(state, self.id)
         
+        # Highest value comes first
+        value = -value
 
         return value
 
