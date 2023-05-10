@@ -1,8 +1,7 @@
 # INFORMATION ------------------------------------------------------------------------------------------------------- #
 
 
-# Purpose: Implement Blind Heuristic Search Algorithm
-# Algorithm: A* algorithm
+# Purpose: Implement Heuristic Search Algorithm
 
 
 # IMPORTS AND CONSTANTS ----------------------------------------------------------------------------------------------#
@@ -32,7 +31,6 @@ class myAgent(Agent):
 
     # Take a list of actions and an initial state, and perform breadth-first search within a time limit.
     # Return the first action that leads to goal, if any was found.
-    # Error myAgent has no turnCount?
     def SelectAction(self, actions, rootstate):
         start_time = time.time()
         queue = priorityQueue.PriorityQueue()
@@ -55,14 +53,12 @@ class myAgent(Agent):
 
                 if (cost <= base_heuristic):
                     base_heuristic = cost
-                    #print(f'Move {self.turn_count}, path found:', next_path) # In some cases, can cause error?
                     return next_path[0] # If the current action reached the goal, return the initial action that led there.
                 else:
                     next_node = (next_state, next_path)
                     queue.push(next_node, cost) # Else, simply add this state and its path to the queue.
         
         if (not queue.isEmpty()):
-        #    print(f'Move {self.turn_count}, path kinda found:', next_path)
             return next_path[0] # If the current action reached the goal, return the initial action that led there.
         return random.choice(actions) # If no goal was found in the time limit, return a random action.
     
