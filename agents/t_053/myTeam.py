@@ -11,12 +11,9 @@
 import time, random
 from Azul.azul_model import AzulGameRule as GameRule
 from copy import deepcopy
-from collections import deque
-from queue import PriorityQueue
-import utils
 from template import Agent
-import heapq
-from queue import Queue
+from copy import deepcopy
+from agents.t_053 import priorityQueue
 
 
 THINKTIME   = 0.9
@@ -32,93 +29,49 @@ class myAgent(Agent):
     # Generates actions from this state.
     def GetActions(self, state):
         return self.game_rule.getLegalActions(state, self.id)
-    
-    # Carry out a given action on this state and return True if goal is reached received.
-    def DoAction(self, state, action):
-        score = state.agents[self.id].score
-        state = self.game_rule.generateSuccessor(state, action, self.id)
-        
-        # Check if whether it reached goal or not TODO:
 
-        # Temporary make a self where it is in the next state
-        temp_self = deepcopy(self)
-        temp_state = deepcopy(state)
-        temp_self.current_game_state = temp_state
-        temp_self.current_agent_index = temp_self.getNextAgentIndex()
-        temp_self.action_counter += 1
-
-        # Check if a row is completed
-        row_completed = temp_self.game_rule.gameEnds()
-        goal_reached = row_completed
-       
-        return goal_reached
-    
-    # Take a list of actions and an initial state, and perform A* search within a time limit. TODO:
+    # Take a list of actions and an initial state, and perform breadth-first search within a time limit.
     # Return the first action that leads to goal, if any was found.
+    # Error myAgent has no turnCount?
     def SelectAction(self, actions, rootstate):
         start_time = time.time()
+        queue = priorityQueue.PriorityQueue()
+        node = (deepcopy(rootstate), [])
+        queue.push(node, 0)
 
-        # Initialize
-        startState = deepcopy(rootstate)
-        startNode = (startState, '',0, [])
+        base_heuristic = 0
         
-        # Conduct EHC search starting from rootstate.
-        while time.time()-start_time < THINKTIME:
+        # Conduct simple heuristic starting from rootstate.
+        while (not queue.isEmpty()) and time.time()-start_time < THINKTIME:
 
-            # Improve function
-            myQ = Queue(maxsize=0)
-            myQ.put(startNode)
-            rootState, rootAction, rootCost, rootPath = startNode
-            rootHeuristic = self.Heuristic(startState)
-
-            visited = set()
+            node = queue.pop()
+            state, path = node
+            new_actions = self.GetActions(state) # Obtain new actions available to the agent in this state.
             
-            while not myQ.empty():
-                node = myQ.get()
-                state, action, cost, path = node
+            for a in new_actions: # Then, for each of these actions...
+                next_state = deepcopy(state)              # Copy the state.
+                next_path  = path + [a]                   # Add this action to the path.
+                cost = self.Heuristic(next_state)
 
-                currentHeuristic = self.Heuristic(state) 
-
-                if (not state in visited):
-                    visited.add(state)
-
-                    # Check heuristic value
-                    if (currentHeuristic > rootHeuristic): 
-                        startState = state
-                        startNode = node # Transfer path
-
-                        # Immediately break the while loop
-                        break
-
-                    # Check successors
-                    new_actions = self.GetActions(state) # Obtain new actions available to the agent in this state.
-
-            
-                    for a in new_actions: # Then, for each of these actions...
-                        next_state = deepcopy(state)              # Copy the state.
-                        next_path  = path + [a]                   # Add this action to the path.
-                        next_action = a                           # Copy the action
-
-                        goal     = self.DoAction(next_state, a) # Carry out this action on the state, and check for goal
-                        if goal:
-                            print(f'Move {self.turn_count}, path found:', next_path)
-                            return next_path[0] # If the current action reached the goal, return the initial action that led there.
-                        else:
-                            new_node = (next_state, next_action, cost, next_path) # New node for next search (cost change?)
-                            myQ.put(new_node) # Else, simply add this state and its path to the queue.
+                if (cost <= base_heuristic):
+                    base_heuristic = cost
+                    #print(f'Move {self.turn_count}, path found:', next_path) # In some cases, can cause error?
+                    return next_path[0] # If the current action reached the goal, return the initial action that led there.
+                else:
+                    next_node = (next_state, next_path)
+                    queue.push(next_node, cost) # Else, simply add this state and its path to the queue.
         
-        with myQ.mutex:
-            myQ.queue.clear()
-
+        if (not queue.isEmpty()):
+        #    print(f'Move {self.turn_count}, path kinda found:', next_path)
+            return next_path[0] # If the current action reached the goal, return the initial action that led there.
         return random.choice(actions) # If no goal was found in the time limit, return a random action.
     
     def Heuristic(self, state):
 
-        value = self.game_rule.calScore(state, self.id)
+        value = state.agents[self.id].score
+        value = -value
 
         return value
+        
     
-    
-
-
 # END FILE -----------------------------------------------------------------------------------------------------------#

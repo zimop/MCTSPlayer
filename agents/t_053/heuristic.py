@@ -56,11 +56,11 @@ class myAgent():
         node = (deepcopy(rootstate), '', [])
         queue.push(node, 0)
 
-        #base_heuristic = 0
+        base_heuristic = 0
         
         # Conduct simple heuristic starting from rootstate.
         while (not queue.isEmpty()) and time.time()-start_time < THINKTIME:
-            #state, path = queue.popleft() # Pop the next node (state, path) in the queue.
+
             node = queue.pop()
             state, action, path = node
             new_actions = self.GetActions(state) # Obtain new actions available to the agent in this state.
@@ -70,9 +70,10 @@ class myAgent():
                 next_path  = path + [a]                   # Add this action to the path.
                 cost = self.Heuristic(next_state, a)
 
-                goal     = self.DoAction(next_state, a) #cost - base_heuristic #self.DoAction(next_state, a) # Carry out this action on the state, and check for goal
-                if goal:
-                    #base_heuristic = goal
+                #goal     = self.DoAction(next_state, a) #cost - base_heuristic #self.DoAction(next_state, a) # Carry out this action on the state, and check for goal
+                #if goal:
+                if (cost <= base_heuristic):
+                    base_heuristic = cost
                     #print(f'Move {self.turn_count}, path found:', next_path) # In some cases, can cause error?
                     return next_path[0] # If the current action reached the goal, return the initial action that led there.
                 else:
@@ -90,9 +91,11 @@ class myAgent():
             return 0
 
         ##state = self.game_rule.generateSuccessor(state, action, self.id) THIS CAUSE ERROR!!!!
-        value = self.game_rule.calScore(state, self.id)
-        ##value = state.agents[self.id].score
+        #value = self.game_rule.calScore(state, self.id)
+        value = state.agents[self.id].score
         value = -value
+
+
 
         return value
         
