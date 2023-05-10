@@ -16,6 +16,7 @@ from queue import PriorityQueue
 import utils
 from template import Agent
 import heapq
+from queue import Queue
 
 
 THINKTIME   = 0.9
@@ -57,45 +58,63 @@ class myAgent(Agent):
     def SelectAction(self, actions, rootstate):
         start_time = time.time()
 
-        pqueue = PriorityQueue()
+        # Initialize
         startState = deepcopy(rootstate)
         startNode = (startState, '',0, [])
-        pqueue.put((self.Heuristic(startState), startNode)) # Initialise priority queue. First node = root state and an empty path.
-
-        visited = set()
-        best_g = dict()
         
-        # Conduct A* search starting from rootstate.
-        while not pqueue.empty() and time.time()-start_time < THINKTIME:
-            state, action, cost, path = pqueue.get() # Pop the next node (state, action, cost, path) in the priority queue with the best value.
-            new_actions = self.GetActions(state) # Obtain new actions available to the agent in this state.
+        # Conduct EHC search starting from rootstate.
+        while time.time()-start_time < THINKTIME:
 
-            # Clear priority queue to avoid illegal move
-            pqueue.queue.clear()
+            # Improve function
+            myQ = Queue(maxsize=0)
+            myQ.put(startNode)
+            rootState, rootAction, rootCost, rootPath = startNode
+            rootHeuristic = self.Heuristic(startState)
 
-            best_g[state] = cost
+            visited = set()
             
-            for a in new_actions: # Then, for each of these actions...
-                next_state = deepcopy(state)              # Copy the state.
-                next_path  = path + [a]                   # Add this action to the path.
-                next_action = a                           # Copy the action
+            while not myQ.empty():
+                node = myQ.get()
+                state, action, cost, path = node
 
-                goal     = self.DoAction(next_state, a) # Carry out this action on the state, and check for goal
-                if goal:
-                    print(f'Move {self.turn_count}, path found:', next_path)
-                    return next_path[0] # If the current action reached the goal, return the initial action that led there.
-                else:
-                    new_node = (next_state, next_action, cost, next_path) # New node for next search (cost change?)
-                    pqueue.put((self.Heuristic(next_state)+cost, new_node)) # Else, simply add this state and its path to the queue.
+                currentHeuristic = self.Heuristic(state) 
+
+                if (not state in visited):
+                    visited.add(state)
+
+                    # Check heuristic value
+                    if (currentHeuristic > rootHeuristic): 
+                        startState = state
+                        startNode = node # Transfer path
+
+                        # Immediately break the while loop
+                        break
+
+                    # Check successors
+                    new_actions = self.GetActions(state) # Obtain new actions available to the agent in this state.
+
+            
+                    for a in new_actions: # Then, for each of these actions...
+                        next_state = deepcopy(state)              # Copy the state.
+                        next_path  = path + [a]                   # Add this action to the path.
+                        next_action = a                           # Copy the action
+
+                        goal     = self.DoAction(next_state, a) # Carry out this action on the state, and check for goal
+                        if goal:
+                            print(f'Move {self.turn_count}, path found:', next_path)
+                            return next_path[0] # If the current action reached the goal, return the initial action that led there.
+                        else:
+                            new_node = (next_state, next_action, cost, next_path) # New node for next search (cost change?)
+                            myQ.put(new_node) # Else, simply add this state and its path to the queue.
         
+        with myQ.mutex:
+            myQ.queue.clear()
+
         return random.choice(actions) # If no goal was found in the time limit, return a random action.
     
     def Heuristic(self, state):
 
         value = self.game_rule.calScore(state, self.id)
-        
-        # Highest value comes first
-        value = -value
 
         return value
     
