@@ -8,7 +8,7 @@ from Azul.azul_model import AzulGameRule as GameRule
 from Azul.azul_model import AzulState as GameState
 from itertools import count
 
-THINKTIME   = 0.75
+THINKTIME   = 0.5
 NUM_PLAYERS = 2
 Q_REWARDS = dict()
 
@@ -23,7 +23,6 @@ class myAgent(Agent):
     def SelectAction(self,actions,root_state):
         start_time = time.time()
         gamma = 0.9
-        
         start = deepcopy(root_state)
         count = 0
         while time.time()-start_time < THINKTIME:
@@ -37,6 +36,7 @@ class myAgent(Agent):
                 
                 firstAction = new_actions[0]
                 firstState = deepcopy(state)
+                
                 self.game_rule.generateSuccessor(firstState, firstAction, self.id)
                 
                 first_futureScore = firstState.agents[self.id].ScoreRound()[0]
@@ -45,13 +45,20 @@ class myAgent(Agent):
                 
                 max_state = firstState
                 max_action = firstAction
-                max_future_reward = first_future_reward
+                max_future_reward = first_future_reward 
                 
-                future_reward = 0
+                
+                #future_reward = 0
+                
+                
                 for a in new_actions[1:]:
+                    
+                    
                     future_reward = 0
                     next_state = deepcopy(state)
+                    
                     self.game_rule.generateSuccessor(next_state, a, self.id)
+                    
                     
                     if (next_state not in closedList):
                         openList.append(next_state)
@@ -63,7 +70,7 @@ class myAgent(Agent):
                         futureScore = next_state.agents[self.id].ScoreRound()[0]
                         futureBonus = next_state.agents[self.id].EndOfGameScore()
                         future_reward = futureScore + futureBonus
-                    
+                        
                     if (future_reward > max_future_reward):
                         max_future_reward = future_reward
                         max_state = next_state
@@ -74,6 +81,10 @@ class myAgent(Agent):
                 bonus = currState.agents[self.id].EndOfGameScore()
                 reward = scoreChange + bonus
                 
-                Q_REWARDS[state] = ((reward + gamma*future_reward), max_state, max_action)
                 
+                #Opponent
+                
+                
+                Q_REWARDS[state] = ((reward + gamma*max_future_reward), max_state, max_action)
+              
         return Q_REWARDS[start][2]

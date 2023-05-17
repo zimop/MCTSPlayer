@@ -8,7 +8,7 @@ from Azul.azul_model import AzulGameRule as GameRule
 from Azul.azul_model import AzulState as GameState
 from itertools import count
 
-THINKTIME   = 0.95
+THINKTIME   = 0.9
 NUM_PLAYERS = 2
 
 class myAgent(Agent):
