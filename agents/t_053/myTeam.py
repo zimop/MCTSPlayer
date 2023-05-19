@@ -1,50 +1,72 @@
-from template import Agent
+from template import Agent 
 from utils import *
-from copy import deepcopy
+from copy import deepcopy 
 from Azul.azul_model import AzulGameRule as GameRule
 
 NUM_PLAYERS = 2
-
+####### MCTS #########
 class myAgent(Agent):
 
+    #initialise 
     def __init__(self, _id):
         super().__init__(_id)
         self.game_rule = GameRule(NUM_PLAYERS)
+        self.id = _id
+        self.weights = {"complete": [1], "not-complete": [1]}
+        self.discount =  0.8 
+        self.alpha = 0.3  
+        self.epsilon = 1
 
-    def SelectAction(self, moves, game_state):
-        return self.heuristic_search(game_state, moves)
+    def SelectAction(self, actions, game_state):
+        action_list = dict()
+        maxQ = float("-inf")
+        current_maximum = None
+        
 
-    def heuristic_search(self, game_state, available_actions):
-        current_round_score = game_state.agents[self.id].ScoreRound()[0]
-        # print(current_round_score)
-        current_bonus_score = game_state.agents[self.id].EndOfGameScore()
-        # print(current_bonus_score)
-        
-        best_action = None
-        highest_score = float('-inf')
-        
-        moves_cnt = len(available_actions)
-        for i in range(moves_cnt):
-            action = available_actions[i]
+
+        for action in actions:
+            q_value = 0.0
+            features_list = []
 
             game_state_copy = deepcopy(game_state)
+            next_state = self.game_rule.generateSuccessor(game_state_copy, action, self.id)
+            if next_state.agents[self.id].GetCompletedRows() > 0:
+                key = "complete"
+            else:
+                key = "not-complete"
 
-            player = self.game_rule.generateSuccessor(game_state_copy, action, self.id)
-            tiles_grab = action[2]
+            current_expected_score, current_bonus = self.CalculateExpectedScore(game_state)
+            next_expected_score, next_bonus = self.CalculateExpectedScore(next_state)
+            
+            expectedGain = next_expected_score + next_bonus - current_expected_score - current_bonus
+            features_list.append(expectedGain)
 
-            if tiles_grab.pattern_line_dest == -1:
-                round_score, used_tiles = player.agents[self.id].ScoreRound()
-                h = round_score - current_round_score
+            features = {key : features_list}
+            
+            if "complete" in features:
+                key = "complete"
 
             else:
-                tiles_grabbed = player.agents[self.id].lines_number[tiles_grab.pattern_line_dest]
-                tiles_needed = tiles_grab.pattern_line_dest + 1 - tiles_grabbed                
-                player.agents[self.id].AddToPatternLine(tiles_grab.pattern_line_dest, tiles_needed, tiles_grab.tile_type)
-                round_score, used_tiles = player.agents[self.id].ScoreRound()
-                bonus_score = player.agents[self.id].EndOfGameScore()
-                h = round_score + bonus_score - current_round_score - current_bonus_score - tiles_needed
+                key = "not-complete"
 
-            if h > highest_score:
-                highest_score = h
-                best_action = action
-        return best_action
+            for x in range(len(self.weights[key])):
+                q_value = q_value + (self.weights[key][x] * features[key][x])
+            
+            action_list[action] = q_value
+
+
+        for key in action_list.keys():
+            if action_list[key] > maxQ:
+                current_maximum = key
+                maxQ = action_list[key]
+
+        return current_maximum
+    
+    def CalculateExpectedScore(self, state):
+        current_state = state.agents[self.id]
+        expected_score, expected_used_tiles = current_state.ScoreRound()
+        bonus_points = current_state.EndOfGameScore()
+        return expected_score, bonus_points
+    
+    
+   
