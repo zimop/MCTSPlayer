@@ -1,85 +1,87 @@
-from collections import deque
-from copy import deepcopy
+import copy
 import time
-from template import Agent, GameRule
 import random
-import heapq
 from Azul.azul_model import AzulGameRule as GameRule
-from Azul.azul_model import AzulState as GameState
-from itertools import count
+from copy import deepcopy
+from collections import deque
+from template import Agent
+import random
 
-THINKTIME   = 0.7
+THINKTIME = 0.3
 NUM_PLAYERS = 2
-Q_REWARDS = dict()
+
 
 class myAgent(Agent):
-    def __init__(self,_id):
+    def __init__(self, _id):
         super().__init__(_id)
         self.game_rule = GameRule(NUM_PLAYERS)
-    
-    def GetActions(self, state):
-        return self.game_rule.getLegalActions(state, self.id)
-    
-    def SelectAction(self,actions,root_state):
-        start_time = time.time()
-        gamma = 0.9
-        start = deepcopy(root_state)
-        count = 0
-        while time.time()-start_time < THINKTIME:
-            count += 1
-            openList = [start]
-            while len(openList) and time.time()-start_time < THINKTIME:
-                state = openList.pop(0)
-                new_actions = self.GetActions(state)
-                
-                firstAction = new_actions[0]
-                firstState = deepcopy(state)
-                
-                self.game_rule.generateSuccessor(firstState, firstAction, self.id)
-                
-                first_futureScore = firstState.agents[self.id].ScoreRound()[0]
-                first_futureBonus = firstState.agents[self.id].EndOfGameScore()
-                first_future_reward = first_futureScore + first_futureBonus
-                
-                max_state = firstState
-                max_action = firstAction
-                max_future_reward = first_future_reward 
-                
-                
-                #future_reward = 0
-                
-                
-                for a in new_actions[1:]:
-                    
-                    
-                    future_reward = 0
-                    next_state = deepcopy(state)
-                    
-                    self.game_rule.generateSuccessor(next_state, a, self.id)
-                    openList.append(next_state)
-                        
-                    if (next_state in Q_REWARDS.keys()):
-                        future_reward, _, _ = Q_REWARDS[next_state]
-                        
-                    else:
-                        futureScore = next_state.agents[self.id].ScoreRound()[0]
-                        futureBonus = next_state.agents[self.id].EndOfGameScore()
-                        future_reward = futureScore + futureBonus
-                        
-                    if (future_reward > max_future_reward):
-                        max_future_reward = future_reward
-                        max_state = next_state
-                        max_action = a
-                
-                currState = deepcopy(state)        
-                scoreChange = currState.agents[self.id].ScoreRound()[0]
-                bonus = currState.agents[self.id].EndOfGameScore()
-                reward = scoreChange + bonus
-                
-                
-                #Opponent
-                
-                
-                Q_REWARDS[state] = ((reward + gamma*max_future_reward), max_state, max_action)
-              
-        return Q_REWARDS[start][2]
+
+    def GetActions(self, state, opponentId):
+        return self.game_rule.getLegalActions(state, opponentId)
+
+    def SelectAction(self, actions, game_state):
+        startTime = time.time()
+        # currGridState = game_state.agents[self.id].grid_state
+        max_reward = 0
+        currBestAction = random.choice(actions)
+
+        # opponentId = abs(self.id - 1)
+
+        for action in actions:
+            inTime = time.time()
+            next_state = copy.deepcopy(game_state)
+
+            self.game_rule.generateSuccessor(next_state, action, self.id)
+
+            scoreChange = next_state.agents[self.id].ScoreRound()[0]
+            bonus = next_state.agents[self.id].EndOfGameScore()
+            reward = scoreChange + bonus
+
+            future_reward = 0
+            counter = 0
+            gamma = 0.2
+            i = abs(self.id - 1)
+            lastRound = False
+
+            while (not next_state.TilesRemaining()):
+                counter = counter + 1
+                result = self.simulate(next_state, i)
+                i = abs(i - 1)
+                lastRound = result[2]
+                if (lastRound):
+                    break
+                if (i == self.id):
+                    future_reward = result[1]
+                    reward = reward + future_reward * (gamma**counter)
+                next_state = result[0]
+
+            if reward > max_reward:
+                currBestAction = action
+                max_reward = reward
+
+        return currBestAction
+
+    def simulate(self, next_state, opponentId):
+        # next_state = GS
+        opponentActions = self.GetActions(next_state, opponentId)
+        max_reward = 0
+        best_move = None
+
+        for action in opponentActions:
+            opp_next_state = copy.deepcopy(next_state)
+            self.game_rule.generateSuccessor(
+                opp_next_state, action, opponentId)
+
+            oppScore = opp_next_state.agents[opponentId].ScoreRound()[0]
+            oppBonus = opp_next_state.agents[opponentId].EndOfGameScore()
+            reward = oppScore + oppBonus
+
+            if (reward >= max_reward):
+                best_move = action
+                max_reward = reward
+        if (best_move == None):
+            return (None, None, True)
+        self.game_rule.generateSuccessor(next_state, best_move, opponentId)
+        ##if (best_move == "ENDROUND"):
+            ##return (next_state, max_reward, True)
+        return (next_state, max_reward, False)
