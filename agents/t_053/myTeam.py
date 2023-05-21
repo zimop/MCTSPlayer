@@ -8,7 +8,7 @@ from Azul.azul_model import AzulGameRule as GameRule
 from Azul.azul_model import AzulState as GameState
 from itertools import count
 
-THINKTIME   = 0.5
+THINKTIME   = 0.7
 NUM_PLAYERS = 2
 Q_REWARDS = dict()
 
@@ -28,10 +28,8 @@ class myAgent(Agent):
         while time.time()-start_time < THINKTIME:
             count += 1
             openList = [start]
-            closedList = []
             while len(openList) and time.time()-start_time < THINKTIME:
                 state = openList.pop(0)
-                closedList.append(state)
                 new_actions = self.GetActions(state)
                 
                 firstAction = new_actions[0]
@@ -58,10 +56,7 @@ class myAgent(Agent):
                     next_state = deepcopy(state)
                     
                     self.game_rule.generateSuccessor(next_state, a, self.id)
-                    
-                    
-                    if (next_state not in closedList):
-                        openList.append(next_state)
+                    openList.append(next_state)
                         
                     if (next_state in Q_REWARDS.keys()):
                         future_reward, _, _ = Q_REWARDS[next_state]

@@ -36,6 +36,7 @@ class myAgent(Agent):
                 
                 firstAction = new_actions[0]
                 firstState = deepcopy(state)
+                print(firstState in (deepcopy(state)))
                 
                 self.game_rule.generateSuccessor(firstState, firstAction, self.id)
                 
@@ -83,7 +84,6 @@ class myAgent(Agent):
                 
                 
                 #Opponent
-                
                 
                 Q_REWARDS[state] = ((reward + gamma*max_future_reward), max_state, max_action)
               
