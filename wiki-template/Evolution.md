@@ -30,7 +30,7 @@ Initially, during the tournament, our algorithm's performance seemed to align wi
 
 This is its performance against value iteration: Where agent 1 is the mcts approximation algorithm
 
-![val it vs mcts](https://github.com/COMP90054-2023S1/assignment3-azul--team_53/assets/80197186/5be161be-1215-4809-a603-31dccb509eac)
+<img width="486" alt="Screenshot 2023-05-22 at 12 25 34 PM" src="https://github.com/COMP90054-2023S1/assignment3-azul--team_53/assets/128003981/b26a524c-eb4b-429c-8120-429f8f3063a7">
 ![val it v mcts](https://github.com/COMP90054-2023S1/assignment3-azul--team_53/assets/80197186/e4515aa5-ed0d-49ca-9ee8-807f822af48c)
 
 it ended up with an elo score of 10480 in the competition, but we still believed it performed better than val iteration even though it had a lower elo score. This lower ELO score could be due to the decreasing function, as more games are played, everyones elo scores start decreasing.
