@@ -1,6 +1,4 @@
-![]("C:\Users\zimop\OneDrive\Pictures\Screenshots\gamma.png")# AI Method 3 - Monte-Carlo Tree Search
-
-*If you use MCTS, then, you can explain about what tree policy/simulation policy you used, how many iteration did you run, what is your reward function, the depth of each simulation etc.*
+# AI Method 3 - Monte-Carlo Tree Search
 
 # Table of Contents
 - [Governing Strategy Tree](#governing-strategy-tree)
