@@ -10,7 +10,8 @@ The first agent that we submitted for the tournament is the Value iteration algo
 
 Our value iteration algorithm strategy was to attain the highest expected reward states, so there are a small number of floor tiles, and large number of consecutive tiles: In this video our value iteration is agent 1 and MCTS is agent 0
 
-[![AzulGame](https://github.com/COMP90054-2023S1/assignment3-azul--team_53/assets/80197186/9e30c4d4-7625-463e-9724-07f9cf4434c5)](https://www.youtube.com/watch?v=VxvTdHGahRE)
+![Untitled](https://github.com/COMP90054-2023S1/assignment3-azul--team_53/assets/80197186/4d894e03-2410-44f9-8299-7ce8856e128c)
+
 
 #### Competition results: Position - 31/101 
 
