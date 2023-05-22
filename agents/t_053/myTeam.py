@@ -20,12 +20,8 @@ class myAgent(Agent):
         return self.game_rule.getLegalActions(state, opponentId)
 
     def SelectAction(self, actions, game_state):
-        startTime = time.time()
-        # currGridState = game_state.agents[self.id].grid_state
         max_reward = 0
         currBestAction = random.choice(actions)
-
-        # opponentId = abs(self.id - 1)
 
         for action in actions:
             inTime = time.time()
@@ -62,7 +58,6 @@ class myAgent(Agent):
         return currBestAction
 
     def simulate(self, next_state, opponentId):
-        # next_state = GS
         opponentActions = self.GetActions(next_state, opponentId)
         max_reward = 0
         best_move = None
@@ -82,6 +77,4 @@ class myAgent(Agent):
         if (best_move == None):
             return (None, None, True)
         self.game_rule.generateSuccessor(next_state, best_move, opponentId)
-        ##if (best_move == "ENDROUND"):
-            ##return (next_state, max_reward, True)
         return (next_state, max_reward, False)
