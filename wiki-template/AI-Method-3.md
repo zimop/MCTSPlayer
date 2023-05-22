@@ -57,7 +57,7 @@ Solved Challenges:
 #### *Disadvantages*
 
 1. Can be difficult to implement the actual solution. The simulation includes simulating the opponents moves aswell, this can be a tricky task, taking into consideration which state should you start the opponent moves from, and dealing with mutable objects.
-2. We still need to go through every node and explore unfavourable actions, which wastes resources and time.
+2. We may need to explore unfavourable actions, which wastes resources and time.
 3. We defined the simulate moves function too simply. We run a simulation with the opponent, but we never take into consideration better moves to make so that the opponent will make a worse move. Instead we look to only maximize our own reward, without thinking about minimizing the opponents reward.
 
 ### Future improvements 
