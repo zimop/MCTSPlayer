@@ -13,10 +13,12 @@
 ## Governing Strategy Tree  
 
 ### Motivation  
-Greedy Best-First Search is chosen as one of the consideration for the AI is mainly due to
-Simplicity: BFS is very intuitive and easy to understand and therefore is easy to implement
-Efficiency: Efficient because it uses very little memory, as it doesnt need to keep information on previous states, only the path to the goal state.
-Speed: Fast since state action evaluation is simple and quick.
+Greedy Best-First Search is chosen as one of the consideration for the AI is mainly due to:
+
+1. Simplicity: BFS is very intuitive and easy to understand and therefore is easy to implement
+2. Efficiency: Efficient because it uses very little memory, as it doesnt need to keep information on previous states, only the path to the goal state.
+3. Speed: Fast since state action evaluation is simple and quick.
+4. Freedom: Has freedom to use any heurestics
 
 ### Application  
 
