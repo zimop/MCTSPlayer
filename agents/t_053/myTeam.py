@@ -20,6 +20,7 @@ class myAgent(Agent):
         return self.game_rule.getLegalActions(state, opponentId)
 
     def SelectAction(self, actions, game_state):
+        startTime = time.time()
         max_reward = 0
         currBestAction = random.choice(actions)
 

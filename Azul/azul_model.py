@@ -393,7 +393,7 @@ class AzulGameRule(GameRule):
 
     def generateSuccessor(self, state, action, agent_id):
         if action == "ENDROUND":
-            for plr in state.agents:
+            for plr in state.agents: 
                 _,used = plr.ScoreRound()
                 state.bag_used.extend(used)
 
