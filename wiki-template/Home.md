@@ -12,6 +12,10 @@
 3. [Evolution and Experiments](Evolution)
 4. [Conclusions and Reflections](Conclusions-and-Reflections)
 
+# YouTube Presentation
+
+[![IMAGE ALT TEXT HERE](http://img.youtube.com/vi/rzKt0fj4LoM/0.jpg)](https://youtu.be/rzKt0fj4LoM)
+
 ## Team Members
 
 
